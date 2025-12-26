@@ -1,12 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { VendorsRepository } from './vendors.repository';
 import { CreateVendorDto } from './dto/create-vendor.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class VendorsService {
   constructor(private readonly repo: VendorsRepository) {}
 
   create(dto: CreateVendorDto) {
+    dto.addedBy = new Types.ObjectId(dto.addedBy)
+
     return this.repo.create(dto);
   }
 

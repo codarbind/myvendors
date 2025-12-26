@@ -8,7 +8,10 @@ export class UsersRepository {
   constructor(
     @InjectModel(User.name)
     private readonly model: Model<User>,
-  ) {}
+  ) {
+
+
+  }
 
   create(data: Partial<User>) {
     return this.model.create(data);
@@ -36,7 +39,7 @@ export class UsersRepository {
 
   async search(search: string, page: number, limit: number) {
     const query: any = {};
-    
+
     if (search) {
       query.$or = [
         { phone: { $regex: search, $options: 'i' } },
@@ -59,7 +62,7 @@ export class UsersRepository {
 
   async findAllPaginated(page: number, limit: number, search?: string) {
     const query: any = {};
-    
+
     if (search) {
       query.$or = [
         { phone: { $regex: search, $options: 'i' } },
@@ -80,17 +83,22 @@ export class UsersRepository {
     return { users, total };
   }
 
-  // These would be implemented with proper relationships
   async findVendorsByUserId(userId: string) {
-    // This should join with vendors collection
-    // For now, returning empty array
-    return [];
+    const user = await this.model
+      .findById(userId)
+      .populate('vendors')
+      .exec();
+
+    return user?.vendors ?? [];
   }
 
   async findNotificationsByUserId(userId: string) {
-    // This should join with notifications collection
-    // For now, returning empty array
-    return [];
+    const user = await this.model
+      .findById(userId)
+      .populate('notifications')
+      .exec();
+
+    return user?.notifications ?? [];
   }
 
   async delete(id: string) {

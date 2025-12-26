@@ -39,8 +39,9 @@ export class AuthService {
   }
 
   async verifyOtp(phone: string, otp: string): Promise<{ success: boolean; user: any; token: string }> {
+
     const stored = this.otpStore.get(phone);
-    
+   
     if (!stored || stored.otp !== otp) {
       throw new UnauthorizedException('Invalid OTP');
     }
@@ -55,7 +56,7 @@ export class AuthService {
 
     // Find or create user
     let user = await this.usersService.findByPhone(phone);
-    console.log('User found during OTP verification:', user);
+
     if (!user) {
       user = await this.usersService.create({ phone });
     }
@@ -70,7 +71,7 @@ export class AuthService {
 
     // Create session
     await this.sessionModel.create({
-      userId: user._id,
+      userId: user._id.toString(),
       token,
       expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
     });

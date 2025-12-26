@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsArray } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateVendorDto {
   @IsString()
@@ -31,7 +32,7 @@ export class CreateVendorDto {
   recommendationNote?: string;
 
   @IsString()
-  addedBy: string;
+  addedBy: Types.ObjectId;
 
   @IsString()
   addedByName: string;

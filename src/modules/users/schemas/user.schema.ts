@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { Vendor } from 'src/modules/vendors/schemas/vendor.schema';
 
 @Schema({ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
 export class User extends Document {
@@ -19,7 +20,9 @@ export class User extends Document {
   role?: string;
 
   // Virtual for vendors added by this user
-  // This would be populated from vendors collection
+  // 🔑 virtuals (TypeScript only)
+  vendors?: Vendor[];
+  notifications?: Notification[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -30,6 +33,7 @@ UserSchema.virtual('vendors', {
   localField: '_id',
   foreignField: 'addedBy',
 });
+
 
 UserSchema.virtual('notifications', {
   ref: 'Notification',

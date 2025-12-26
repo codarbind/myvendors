@@ -1,7 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { User } from 'src/modules/users/schemas/user.schema';
 
-@Schema({ timestamps: true })
+@Schema({
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+})
 export class Vendor extends Document {
   @Prop({ index: true })
   name: string;
@@ -36,8 +41,13 @@ export class Vendor extends Document {
   @Prop()
   recommendationNote?: string;
 
-  @Prop({ index: true })
-  addedBy: string;
+@Prop({
+  type: Types.ObjectId,
+  ref: 'User',
+  required: true,
+  index: true,
+})
+addedBy: Types.ObjectId;
 
   @Prop()
   addedByName: string;
@@ -56,6 +66,19 @@ export class Vendor extends Document {
 
   @Prop()
   deletedAt?: Date;
+
+  // virtual (TypeScript only)
+  recommender?: User;
 }
 
+
 export const VendorSchema = SchemaFactory.createForClass(Vendor);
+
+
+VendorSchema.virtual('recommender', {
+  ref: 'User',
+  localField: 'addedBy',
+  foreignField: '_id',
+  justOne: false,
+});
+

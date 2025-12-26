@@ -14,10 +14,10 @@ export class UsersService {
     private readonly repo: UsersRepository,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<any> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     // Check if user already exists
     const existingUser = await this.repo.findByPhone(createUserDto.phone);
-    console.log({ existingUser });
+
     if (existingUser) {
       return this.sanitizeUser(existingUser);
       //throw new BadRequestException('User with this phone already exists');
@@ -27,21 +27,18 @@ export class UsersService {
     return this.sanitizeUser(user);
   }
 
-  async findById(id: string): Promise<any> {
+  async findById(id: string): Promise<User | null> {
     const user = await this.repo.findById(id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.sanitizeUser(user);
+    return user? this.sanitizeUser(user): null;
   }
 
-  async findByPhone(phone: string): Promise<any> {
+  async findByPhone(phone: string): Promise<User | null> {
     const user = await this.repo.findByPhone(phone);
-    console.log({ phone, user });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    return this.sanitizeUser(user);
+
+    return user? this.sanitizeUser(user): null;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {

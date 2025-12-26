@@ -6,7 +6,7 @@ export class VendorsRepository {
   constructor(
     @InjectModel(Vendor.name)
     private readonly model: Model<Vendor>,
-  ) {}
+  ) { }
 
   create(data: Partial<Vendor>) {
     return this.model.create(data);
@@ -16,8 +16,15 @@ export class VendorsRepository {
     return this.model.findOne({ _id: id, deleted: false }).exec();
   }
 
-  findByWhatsapp(whatsapp: string) {
-    return this.model.findOne({ whatsapp, deleted: false }).exec();
+  async findByWhatsapp(whatsapp: string) {
+    const vendor = await this.model.find({ whatsapp, deleted: false })
+      .populate({
+        path: 'recommender',
+        select: 'name phone',
+      })
+      .exec();
+
+      return vendor
   }
 
   async paginate(

@@ -53,7 +53,7 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'User already exists' })
   async create(@Body() createUserDto: CreateUserDto) {
-    console.log('CreateUserDto:', createUserDto);
+
     const user = await this.usersService.create(createUserDto);
     return {
       success: true,
