@@ -79,10 +79,15 @@ export class UsersService {
 
     // Get vendors added by this user
     const vendors = await this.repo.findVendorsByUserId(userId);
+
+    //get notifications for user
+
+    const notifications = await this.repo.findNotificationsByUserId(userId)
     
     return {
       ...this.sanitizeUser(user),
       vendors,
+      notifications
     };
   }
 
