@@ -2,10 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { VendorsRepository } from './vendors.repository';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { Types } from 'mongoose';
+import { SearchVendorDto } from './dto/search-vendor.dto';
+import { VendorListDto, VendorListResponseDto } from './dto/getAllVendors.dto';
 
 @Injectable()
 export class VendorsService {
-  constructor(private readonly repo: VendorsRepository) {}
+  constructor(private readonly repo: VendorsRepository) { }
 
   create(dto: CreateVendorDto) {
     dto.addedBy = new Types.ObjectId(dto.addedBy)
@@ -23,20 +25,50 @@ export class VendorsService {
     return this.repo.findByWhatsapp(whatsapp);
   }
 
-  async list(page: number, limit: number, includeHidden: boolean) {
-    const { vendors, total } = await this.repo.paginate(
-      page,
-      limit,
-      includeHidden,
-    );
+  async list(dto: VendorListDto): Promise<VendorListResponseDto> {
+    const { vendors, total } = await this.repo.paginate({
+      page: dto.page,
+      limit: dto.limit,
+      includeHidden: dto.includeHidden,
+      q: dto.q,
+      specialty: dto.specialty,
+      deleted:  false,
+    });
 
     return {
       vendors,
       total,
-      page,
-      totalPages: Math.ceil(total / limit),
+      page: dto.page || 1,
+      totalPages: Math.ceil(total / (dto.limit || 10)),
     };
   }
+
+  async search(queries: SearchVendorDto) {
+    const { q, specialty } = queries;
+
+    const filter: any = {
+      deleted: false,
+      isVisible: true,
+    };
+
+    if (specialty) {
+      filter.specialty = new RegExp(`^${specialty}$`, 'i'); // case-insensitive exact match
+    }
+
+    if (q) {
+      filter.$or = [
+        { name: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } },
+        { location: { $regex: q, $options: 'i' } },
+      ];
+    }
+
+    const vendors = await this.repo
+      .paginate({ q, specialty })
+
+    return vendors
+  }
+
 
   incrementView(whatsapp: string) {
     return this.repo.incrementView(whatsapp);

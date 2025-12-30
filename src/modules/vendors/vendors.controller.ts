@@ -8,33 +8,35 @@ import {
   Query,
   Body,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
+import { SearchVendorDto } from './dto/search-vendor.dto';
+import { VendorListDto, VendorListResponseDto } from './dto/getAllVendors.dto';
 
 @ApiTags('Vendors')
 @Controller('api/vendors')
 export class VendorsController {
-  constructor(private readonly vendors: VendorsService) {}
+  constructor(private readonly vendors: VendorsService) { }
 
   @Get()
   @ApiOperation({ summary: 'Get all vendors (paginated)' })
-  list(
-    @Query('page') page = 1,
-    @Query('limit') limit = 12,
-    @Query('includeHidden') includeHidden = 'false',
-  ) {
-    return this.vendors.list(
-      Number(page),
-      Number(limit),
-      includeHidden === 'true',
-    );
+  @ApiOkResponse({ type: VendorListResponseDto })
+  async list(@Query() dto: VendorListDto) {
+    return this.vendors.list(dto);
+  }
+
+  @Get('search')
+  search(@Query() queries: SearchVendorDto) {
+    return this.vendors.search(queries);
   }
 
   @Get(':vendorId')
   get(@Param('vendorId') vendorId: string) {
     return this.vendors.getById(vendorId);
   }
+
+
 
   @Get('whatsapp/:whatsapp')
   getByWhatsapp(@Param('whatsapp') whatsapp: string) {

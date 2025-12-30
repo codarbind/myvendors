@@ -17,9 +17,16 @@ export class UsersRepository {
     return this.model.create(data);
   }
 
-  findById(id: string) {
-    return this.model.findById(id).exec();
-  }
+findById(id: string) {
+  return this.model
+    .findById(id)
+    .populate({
+      path: 'vendors',
+      match: { isVisible: true },
+    })
+    .exec();
+}
+
 
   findByPhone(phone: string) {
     return this.model.findOne({ phone }).exec();
