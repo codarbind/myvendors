@@ -26,6 +26,8 @@ export class VendorsController {
     return this.vendors.list(dto);
   }
 
+
+
   @Get('search')
   search(@Query() queries: SearchVendorDto) {
     return this.vendors.search(queries);

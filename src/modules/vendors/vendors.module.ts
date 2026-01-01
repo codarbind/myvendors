@@ -13,5 +13,6 @@ import { Vendor, VendorSchema } from './schemas/vendor.schema';
   ],
   controllers: [VendorsController],
   providers: [VendorsService, VendorsRepository],
+  exports: [VendorsService]
 })
-export class VendorsModule {}
+export class VendorsModule { }

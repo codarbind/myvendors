@@ -12,6 +12,7 @@ import { MockProvider } from './otp/providers/mock.provider';
 import { WhatsappCloudProvider } from './otp/providers/whatsapp-cloud.provider';
 import { BaileysProvider } from './otp/providers/baileys.provider';
 import { JwtStrategy } from './jwt.strategy';
+import { CustomConfigService } from 'src/config/config.service';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { JwtStrategy } from './jwt.strategy';
     AuthService,
     JwtStrategy,
     OtpService,
+    CustomConfigService,
     {
       provide: 'OTP_PROVIDER',
       useFactory: (configService: ConfigService) => {

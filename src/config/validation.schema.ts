@@ -52,6 +52,9 @@ export const validationSchema = Joi.object({
   SESSION_EXPIRY_DAYS: Joi.number().default(14),
   REINVITE_COOLDOWN_DAYS: Joi.number().default(10),
   NAME_EDIT_COOLDOWN_MONTHS: Joi.number().default(3),
+
+  //admin
+  ADMIN_LIST: Joi.string(),
 })
 // Allow unknown environment variables (system variables, etc.)
 .unknown(true);

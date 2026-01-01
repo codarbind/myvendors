@@ -10,7 +10,7 @@ import {
 } from './types/config.types';
 
 @Injectable()
-export class ConfigService {
+export class CustomConfigService {
   constructor(private nestConfigService: NestConfigService) {}
 
   get app(): AppConfig {

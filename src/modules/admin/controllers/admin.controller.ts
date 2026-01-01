@@ -1,15 +1,27 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdminAnalyticsService } from '../services/admin-analytics.service';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../../common/guards/roles.guard';
+import { VendorListDto, VendorListResponseDto } from 'src/modules/vendors/dto/getAllVendors.dto';
+import { VendorsService } from 'src/modules/vendors/vendors.service';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @ApiTags('Admin')
 @Controller('api/admin')
-@UseGuards(RolesGuard)
-@Roles('admin')
+@UseGuards(JwtAuthGuard)
 export class AdminController {
-  constructor(private readonly analytics: AdminAnalyticsService) {}
+  constructor(private readonly vendors: VendorsService, private readonly analytics: AdminAnalyticsService) { }
+
+  @Get('vendors')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Get all vendors (paginated) Admin' })
+  @ApiOkResponse({ type: VendorListResponseDto })
+  async adminList(@Query() dto: VendorListDto) {
+    return this.vendors.list({ ...dto, includeHidden: true });
+  }
+
 
   @Get('stats/overview')
   overview() {

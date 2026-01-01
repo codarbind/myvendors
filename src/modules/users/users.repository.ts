@@ -80,6 +80,7 @@ findById(id: string) {
     const [users, total] = await Promise.all([
       this.model
         .find(query)
+        .populate('vendors notifications')
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ createdAt: -1 })

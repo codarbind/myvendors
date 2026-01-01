@@ -6,16 +6,18 @@ import { OtpService } from './otp/otp.service';
 import { UsersService } from '../users/users.service';
 import { Session } from './schemas/session.schema';
 import { RefreshToken } from './schemas/refresh-token.schema';
+import { CustomConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly configService: CustomConfigService,
     @InjectModel(Session.name) private sessionModel: Model<Session>,
     @InjectModel(RefreshToken.name) private refreshTokenModel: Model<RefreshToken>,
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   private otpStore = new Map<string, { otp: string; expiresAt: Date }>();
 
@@ -41,7 +43,7 @@ export class AuthService {
   async verifyOtp(phone: string, otp: string): Promise<{ success: boolean; user: any; token: string }> {
 
     const stored = this.otpStore.get(phone);
-   
+
     if (!stored || stored.otp !== otp) {
       throw new UnauthorizedException('Invalid OTP');
     }
@@ -62,10 +64,10 @@ export class AuthService {
     }
 
     // Generate JWT token
-    const payload = { 
-      sub: user._id, 
+    const payload = {
+      sub: user._id,
       phone: user.phone,
-      role: 'user' 
+      role: this.resolveUserRole(user.phone)
     };
     const token = this.jwtService.sign(payload);
 
@@ -83,7 +85,22 @@ export class AuthService {
     };
   }
 
+  private resolveUserRole(userPhone: string): 'admin' | 'user' {
+    const adminList = this.configService
+      .getOrThrow<string>('ADMIN_LIST')
+      .split(',')
+      .map(v => v.trim());
+
+    const isAdmin =
+      adminList.includes(userPhone) ||
+      adminList.includes(`+${userPhone}`);
+
+    return isAdmin ? 'admin' : 'user';
+  }
+
+
   async validateUser(payload: any) {
-    return this.usersService.findById(payload.sub);
+
+    return { ...(await this.usersService.findById(payload.sub)), role: this.resolveUserRole(payload.phone) }
   }
 }
