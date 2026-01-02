@@ -13,6 +13,8 @@ import { WhatsappCloudProvider } from './otp/providers/whatsapp-cloud.provider';
 import { BaileysProvider } from './otp/providers/baileys.provider';
 import { JwtStrategy } from './jwt.strategy';
 import { CustomConfigService } from 'src/config/config.service';
+import { MessageService } from '../messagings/message.service';
+import { MessageModule } from '../messagings/messagings.module';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { CustomConfigService } from 'src/config/config.service';
       }),
     }),
     UsersModule,
+    MessageModule
   ],
   controllers: [AuthController],
   providers: [
@@ -38,18 +41,18 @@ import { CustomConfigService } from 'src/config/config.service';
     CustomConfigService,
     {
       provide: 'OTP_PROVIDER',
-      useFactory: (configService: ConfigService) => {
+      useFactory: (configService: ConfigService, messageService: MessageService) => {
         const provider = configService.get<string>('OTP_PROVIDER', 'mock');
         switch (provider) {
           case 'whatsapp_cloud':
-            return new WhatsappCloudProvider(configService);
+            return new WhatsappCloudProvider(messageService);
           case 'baileys':
             return new BaileysProvider(configService);
           default:
             return new MockProvider();
         }
       },
-      inject: [ConfigService],
+      inject: [ConfigService, MessageService],
     },
   ],
   exports: [AuthService],
