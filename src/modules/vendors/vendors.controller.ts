@@ -13,11 +13,13 @@ import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { SearchVendorDto } from './dto/search-vendor.dto';
 import { VendorListDto, VendorListResponseDto } from './dto/getAllVendors.dto';
+import { MessageService } from '../messagings/message.service';
+import { removePlus } from 'src/common/utils/formatter';
 
 @ApiTags('Vendors')
 @Controller('api/vendors')
 export class VendorsController {
-  constructor(private readonly vendors: VendorsService) { }
+  constructor(private readonly vendors: VendorsService, private readonly messagingService: MessageService) { }
 
   @Get()
   @ApiOperation({ summary: 'Get all vendors (paginated)' })
@@ -48,7 +50,17 @@ export class VendorsController {
   @Post()
   @ApiOperation({ summary: 'Add vendor' })
   create(@Body() dto: CreateVendorDto) {
-    return this.vendors.create(dto);
+    
+    const createdVendor = this.vendors.create(dto);
+    const phoneNumber = removePlus(dto.whatsapp)
+    const vendor = { name: dto.name, specialty: dto.specialty, whatsapp: dto.whatsapp }
+    const user = { name: '' }
+    const vendorUrl = `https://myVendors.name.ng/share/${vendor.whatsapp}`;
+    const text = `Hi ${vendor.name}!\n\n${user.name || 'Someone'} just listed you on myVendors.name.ng as a trusted ${vendor.specialty}.\n\nYour profile: ${vendorUrl}\n\nNow their friends and family can easily find and contact you!`
+
+    this.messagingService.sendFromInternalService(text, phoneNumber)
+
+    return createdVendor
   }
 
   @Post('whatsapp/:whatsapp/view')

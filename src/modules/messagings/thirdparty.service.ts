@@ -102,9 +102,9 @@ export class ThirdPartyService {
     retryCount = 0,
   ): Promise<any> {
     try {
-        console.log({endpoint,config})
+
       const response = await this.client.post(endpoint, formData, config);
-      console.log({rsdfd: response})
+
       return response;
     } catch (error) {
       if (retryCount < this.config.maxRetries) {
