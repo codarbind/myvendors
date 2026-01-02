@@ -11,11 +11,12 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { InvitesService } from './invites.service';
 import { CreateInviteDto } from './dto/create-invite.dto';
 import { UpdateInviteDto } from './dto/update-invite.dto';
+import { MessageService } from '../messagings/message.service';
 
 @ApiTags('Invites')
 @Controller('api')
 export class InvitesController {
-  constructor(private readonly invites: InvitesService) {}
+  constructor(private readonly invites: InvitesService, private readonly messagingService: MessageService) { }
 
   @Get('users/:userId/invites')
   getUserInvites(@Param('userId') userId: string) {
@@ -24,8 +25,16 @@ export class InvitesController {
 
   @Post('invites')
   @ApiOperation({ summary: 'Create invite' })
-  create(@Body() dto: CreateInviteDto) {
-    return this.invites.create(dto);
+  async create(@Body() dto: CreateInviteDto) {
+    const invitation = await this.invites.create(dto);
+
+    const vendorName = invitation.vendorName
+    const finalSpecialty = invitation.specialty
+    const generatedLink = `https://myVendors.name.ng/join/${invitation.token}`
+    const phoneNumber = invitation.vendorPhone
+    const text = `Hi${vendorName ? ` ${vendorName}` : ''}! Someone would like to add you to their list of trusted vendors on myVendors.\n\nPlease complete your details here:\n${generatedLink}\n\n${finalSpecialty ? `Their friends want them to refer a ${finalSpecialty}.` : ''}`
+    this.messagingService.sendFromInternalService(text, phoneNumber)
+    return invitation
   }
 
   @Get('invites/:token')

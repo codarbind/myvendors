@@ -14,7 +14,7 @@ export class Vendor extends Document {
   @Prop({ index: true })
   specialty: string;
 
-  @Prop({ unique: true, index: true })
+  @Prop({  index: true })
   whatsapp: string;
 
   @Prop()

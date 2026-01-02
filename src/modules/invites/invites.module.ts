@@ -7,9 +7,11 @@ import {
   VendorInvite,
   VendorInviteSchema,
 } from './schemas/vendor-invite.schema';
+import { MessageModule } from '../messagings/messagings.module';
 
 @Module({
   imports: [
+    MessageModule,
     MongooseModule.forFeature([
       { name: VendorInvite.name, schema: VendorInviteSchema },
     ]),
