@@ -94,7 +94,10 @@ findById(id: string) {
   async findVendorsByUserId(userId: string) {
     const user = await this.model
       .findById(userId)
-      .populate('vendors')
+       .populate({
+      path: 'vendors',
+      match: { deleted: false },
+    })
       .exec();
 
     return user?.vendors ?? [];
