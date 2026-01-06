@@ -56,7 +56,7 @@ export class VendorsController {
     const vendor = { name: dto.name, specialty: dto.specialty, whatsapp: dto.whatsapp }
     const user = { name: '' }
     const vendorUrl = `https://myVendors.name.ng/share/${vendor.whatsapp}`;
-    const text = `Hi ${vendor.name}!\n\n${user.name || 'Someone'} just listed you on myVendors.name.ng as a trusted ${vendor.specialty}.\n\nYour profile: ${vendorUrl}\n\nNow their friends and family can easily find and contact you!`
+    const text = `Hi ${vendor.name}!\n\n${user.name || 'Someone'} just listed you on myVendors.name.ng as a trusted ${vendor.specialty}.\n\nYour profile: ${vendorUrl}\n\nNow their friends and family can easily find and patronise you!`
 
     this.messagingService.sendFromInternalService(text, phoneNumber)
 

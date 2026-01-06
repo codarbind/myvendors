@@ -30,9 +30,9 @@ export class InvitesController {
 
     const vendorName = invitation.vendorName
     const finalSpecialty = invitation.specialty
-    const generatedLink = `https://myVendors.name.ng/join/${invitation.token}`
+    const generatedLink = `https://myVendors.name.ng/confirm/${invitation.token}`
     const phoneNumber = invitation.vendorPhone
-    const text = `Hi${vendorName ? ` ${vendorName}` : ''}! Someone would like to add you to their list of trusted vendors on myVendors.\n\nPlease complete your details here:\n${generatedLink}\n\n${finalSpecialty ? `Their friends want them to refer a ${finalSpecialty}.` : ''}`
+    const text = `Hi${vendorName ? ` ${vendorName}` : ''}! Someone would like to add you to their list of trusted vendors on myVendors.\n\nPlease confirm your details here:\n${generatedLink}\n\n${finalSpecialty ? `Their friends want them to refer a ${finalSpecialty}.` : ''}`
     this.messagingService.sendFromInternalService(text, phoneNumber)
     return invitation
   }

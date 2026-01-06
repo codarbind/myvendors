@@ -1,20 +1,15 @@
 FROM node:20-alpine
 
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=256"
+
 WORKDIR /app
 
-# Install only prod deps
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-# Copy source
-COPY . .
-
-# Build
-RUN npm run build
-
-# Limit memory (VERY important on low RAM)
-ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=256"
+# Copy only compiled output
+COPY dist ./dist
 
 EXPOSE 3000
 
